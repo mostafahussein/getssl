@@ -370,7 +370,7 @@ check_config() { # check the config files for all obvious errors
         config_errors=true
       fi
       # check domain exist
-      if [[ "$DNS_CHECK_FUNC" == "drill" ]] !! [[ "$DNS_CHECK_FUNC" == "dig" ]]; then
+      if [[ "$DNS_CHECK_FUNC" == "drill" ]] || [[ "$DNS_CHECK_FUNC" == "dig" ]]; then
         if [[ "$($DNS_CHECK_FUNC "${d}" SOA|grep -c "^${d}")" -ge 1 ]]; then
           debug "found IP for ${d}"
         else
@@ -690,7 +690,7 @@ get_auth_dns() { # get the authoritative dns server for a domain (sets primary_n
     return
   fi
 
-  if [[ "$DNS_CHECK_FUNC" == "drill" ]] !! [[ "$DNS_CHECK_FUNC" == "dig" ]]; then
+  if [[ "$DNS_CHECK_FUNC" == "drill" ]] || [[ "$DNS_CHECK_FUNC" == "dig" ]]; then
     if [[ -z "$gad_s" ]]; then #checking for CNAMEs
       res=$($DNS_CHECK_FUNC CNAME "$gad_d"| grep "^$gad_d")
     else
@@ -1414,7 +1414,7 @@ get_os
 requires which
 requires openssl
 requires curl
-requires nslookup drill dig DNS_CHECK_FUNC
+requires nslookup drill dig host DNS_CHECK_FUNC
 requires awk
 requires tr
 requires date
@@ -1945,7 +1945,7 @@ if [[ $VALIDATE_VIA_DNS == "true" ]]; then
             check_result=$(nslookup -type=txt "_acme-challenge.${d}" "${ns}" \
                            | grep ^_acme -A2\
                            | grep '"'|awk -F'"' '{ print $2}')
-          elif [[ "$DNS_CHECK_FUNC" == "drill" ]] !! [[ "$DNS_CHECK_FUNC" == "dig" ]]; then
+          elif [[ "$DNS_CHECK_FUNC" == "drill" ]] || [[ "$DNS_CHECK_FUNC" == "dig" ]]; then
             check_result=$($DNS_CHECK_FUNC "_acme-challenge.${d}" "@${ns}" TXT \
                            | grep ^_acme|awk -F'"' '{ print $2}')
           elif [[ "$DNS_CHECK_FUNC" == "host" ]]; then
