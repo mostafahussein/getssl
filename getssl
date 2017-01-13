@@ -378,7 +378,7 @@ check_config() { # check the config files for all obvious errors
           config_errors=true
         fi
       elif [[ "$DNS_CHECK_FUNC" == "host" ]]; then
-        if [[ "$($DNS_CHECK_FUN "${d}" |grep -c "^${d}")" -ge 1 ]]; then
+        if [[ "$($DNS_CHECK_FUNC "${d}" |grep -c "^${d}")" -ge 1 ]]; then
           debug "found IP for ${d}"
         else
           info "${DOMAIN}: DNS lookup failed for ${d}"
@@ -719,9 +719,9 @@ get_auth_dns() { # get the authoritative dns server for a domain (sets primary_n
 
   if [[ "$DNS_CHECK_FUNC" == "host" ]]; then
     if [[ -z "$gad_s" ]]; then
-      res=$($DNS_CHECK_FUN -t NS "$gad_d"| grep "name server")
+      res=$($DNS_CHECK_FUNC -t NS "$gad_d"| grep "name server")
     else
-      res=$($DNS_CHECK_FUN -t NS "$gad_d" "$gad_s"| grep "name server")
+      res=$($DNS_CHECK_FUNC -t NS "$gad_d" "$gad_s"| grep "name server")
     fi
     if [[ -z "$res" ]]; then
       error_exit "couldn't find primary DNS server - please set AUTH_DNS_SERVER in config"
@@ -1949,7 +1949,7 @@ if [[ $VALIDATE_VIA_DNS == "true" ]]; then
             check_result=$($DNS_CHECK_FUNC "_acme-challenge.${d}" "@${ns}" TXT \
                            | grep ^_acme|awk -F'"' '{ print $2}')
           elif [[ "$DNS_CHECK_FUNC" == "host" ]]; then
-            check_result=$($DNS_CHECK_FUN -t TXT "_acme-challenge.${d}" "${ns}" \
+            check_result=$($DNS_CHECK_FUNC -t TXT "_acme-challenge.${d}" "${ns}" \
                            | grep ^_acme|awk -F'"' '{ print $2}')
           else
             check_result=$(nslookup -type=txt "_acme-challenge.${d}" "${ns}" \
